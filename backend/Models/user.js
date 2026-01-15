@@ -1,4 +1,4 @@
-// Backend User Model
+
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 
-  // Password reset fields
+  
   resetToken: String,
   resetTokenExpiry: Date,
 

@@ -1,5 +1,5 @@
 
-// Backend Job Model
+
 import mongoose from 'mongoose'
 
 const jobSchema = new mongoose.Schema({
@@ -27,8 +27,7 @@ const jobSchema = new mongoose.Schema({
   },
   skills: [String],
   experience: String,
-  
-  // Foreign key reference
+
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

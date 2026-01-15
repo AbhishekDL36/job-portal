@@ -5,10 +5,10 @@ import auth from '../Middlewares/auth.js';
 import { checkJob, checkStatus, postJOb, userApplication } from '../Controllers/application.js';
 
 
-const router = express.Router();
-router.post('/:jobId', auth,postJOb );
-router.get('/my-applications', auth,checkJob );
-router.get('/user-applications', auth,userApplication );
-router.put('/:applicationId/status', auth, checkStatus);
+const approuter = express.Router();
+approuter.post('/:jobId', auth,postJOb );
+approuter.get('/my-applications', auth,checkJob );
+approuter.get('/user-applications', auth,userApplication );
+approuter.put('/:applicationId/status', auth, checkStatus);
 
-module.exports = router;
+export default approuter;
