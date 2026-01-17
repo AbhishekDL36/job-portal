@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jobsAPI, applicationsAPI } from '../api/auth';
 import { MapPin, DollarSign, Briefcase, Search, CheckCircle } from 'lucide-react';
+import ShareButton from '../components/ShareButton';
 
 function JobsList() {
   const navigate = useNavigate();
@@ -186,24 +187,27 @@ function JobsList() {
                     )}
                   </div>
 
-                  {/* Applied Status Button */}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    {isApplied ? (
-                      <button
-                        disabled
-                        className="w-full bg-green-100 text-green-700 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
-                      >
-                        <CheckCircle className="w-5 h-5" />
-                        Applied
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => navigate(`/jobs/${job._id}`)}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
-                      >
-                        Apply Now
-                      </button>
-                    )}
+                  {/* Applied Status Button & Share */}
+                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                    <div className="flex gap-2">
+                      {isApplied ? (
+                        <button
+                          disabled
+                          className="flex-1 bg-green-100 text-green-700 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                          Applied
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/jobs/${job._id}`)}
+                          className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+                        >
+                          Apply Now
+                        </button>
+                      )}
+                      <ShareButton job={job} />
+                    </div>
                   </div>
                 </div>
               );

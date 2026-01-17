@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { jobsAPI, applicationsAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, DollarSign, Briefcase, AlertCircle, CheckCircle } from 'lucide-react';
+import ShareButton from '../components/ShareButton';
 
 function JobDetail() {
   const { id } = useParams();
@@ -89,9 +90,12 @@ function JobDetail() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
               <p className="text-xl text-gray-600">{job.companyName || 'Company'}</p>
             </div>
-            <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-medium">
-              {job.jobType}
-            </span>
+            <div className="flex gap-3 items-start">
+              <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-medium">
+                {job.jobType}
+              </span>
+              <ShareButton job={job} />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
