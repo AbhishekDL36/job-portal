@@ -4,6 +4,7 @@ import { jobsAPI, applicationsAPI } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, DollarSign, Briefcase, AlertCircle, CheckCircle } from 'lucide-react';
 import ShareButton from '../components/ShareButton';
+import SimilarJobs from '../components/SimilarJobs';
 
 function JobDetail() {
   const { id } = useParams();
@@ -225,6 +226,9 @@ function JobDetail() {
             </div>
           )}
         </div>
+
+        {/* Similar Jobs Section */}
+        {job && <SimilarJobs currentJob={job} />}
       </div>
     </div>
   );
