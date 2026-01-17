@@ -27,3 +27,11 @@ export const applicationsAPI = {
     client.put(`/applications/${applicationId}/status`, { status }),
   getApplicationStats: () => client.get('/applications/user/stats'),
 };
+
+export const resumeAPI = {
+  saveResume: (data) => client.post('/resume', data),
+  getResume: () => client.get('/resume'),
+  deleteResume: () => client.delete('/resume'),
+  getSuggestions: () => client.get('/resume/suggestions'),
+  getJobMatch: (jobId) => client.get(`/resume/match/${jobId}`),
+};

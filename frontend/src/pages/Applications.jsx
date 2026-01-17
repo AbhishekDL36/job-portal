@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { applicationsAPI } from '../api/auth';
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { useApplicationMonitor } from '../hooks/useApplicationMonitor';
 
 function Applications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+
+  // Monitor for application status changes
+  useApplicationMonitor();
 
   useEffect(() => {
     fetchApplications();

@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import Navbar from './components/Navbar';
+import NotificationBar from './components/NotificationBar';
 import PrivateRoute from './components/PrivateRoute';
 
 // Pages
@@ -12,6 +14,8 @@ import VerifyOTP from './pages/VerifyOTP';
 import JobsList from './pages/JobsList';
 import JobDetail from './pages/JobDetail';
 import Applications from './pages/Applications';
+import ResumeBuilder from './pages/ResumeBuilder';
+import ResumePreview from './pages/ResumePreview';
 import EmployerDashboard from './pages/EmployerDashboard';
 import PostJob from './pages/PostJob';
 import EmployerApplications from './pages/EmployerApplications';
@@ -20,10 +24,11 @@ function AppContent() {
   const { isAuthenticated, user } = useAuth();
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
+      <NotificationBar />
       <Routes>
-       
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
@@ -51,6 +56,22 @@ function AppContent() {
           element={
             <PrivateRoute requiredRole="job_seeker">
               <Applications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/resume-builder"
+          element={
+            <PrivateRoute requiredRole="job_seeker">
+              <ResumeBuilder />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/resume-preview"
+          element={
+            <PrivateRoute requiredRole="job_seeker">
+              <ResumePreview />
             </PrivateRoute>
           }
         />
@@ -84,15 +105,19 @@ function AppContent() {
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

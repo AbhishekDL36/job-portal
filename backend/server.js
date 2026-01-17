@@ -8,6 +8,7 @@ import { testEmailConnection } from "./Services/emailService.js";
 import authRouter from "./Routers/auth.js";
 import applicationRouter from "./Routers/application.js";
 import jobRouter from "./Routers/job.js";
+import resumeRouter from "./Routers/resume.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ testEmailConnection();
 app.use('/api/auth', authRouter);
 app.use('/api/applications', applicationRouter);
 app.use('/api/jobs', jobRouter);
+app.use('/api/resume', resumeRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jobsAPI } from '../api/auth';
-import { MapPin, DollarSign, Briefcase, Search } from 'lucide-react';
+import { jobsAPI, applicationsAPI } from '../api/auth';
+import { MapPin, DollarSign, Briefcase, Search, CheckCircle } from 'lucide-react';
 
 function JobsList() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
+  const [appliedJobIds, setAppliedJobIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -16,7 +17,18 @@ function JobsList() {
 
   useEffect(() => {
     fetchJobs();
+    fetchUserApplications();
   }, [filters]);
+
+  const fetchUserApplications = async () => {
+    try {
+      const response = await applicationsAPI.getUserApplications();
+      const jobIds = response.data.map(app => app.jobId._id);
+      setAppliedJobIds(jobIds);
+    } catch (err) {
+      console.error('Failed to fetch user applications:', err);
+    }
+  };
 
   const fetchJobs = async () => {
     try {
@@ -116,59 +128,86 @@ function JobsList() {
               <p className="text-gray-600">No jobs found. Try adjusting your filters.</p>
             </div>
           ) : (
-            filteredJobs.map(job => (
-              <div
-                key={job._id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer"
-                onClick={() => navigate(`/jobs/${job._id}`)}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">{job.title}</h2>
-                    <p className="text-gray-600">{job.companyName || 'Company'}</p>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    {job.jobType}
-                  </span>
-                </div>
-
-                <p className="text-gray-600 mb-4 line-clamp-2">{job.description}</p>
-
-                <div className="flex flex-wrap gap-6 mb-4">
-                  {job.location && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4" />
-                      <span>{job.location}</span>
-                    </div>
-                  )}
-                  {job.salary?.min && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <DollarSign className="w-4 h-4" />
-                      <span>${job.salary.min.toLocaleString()} - ${job.salary.max?.toLocaleString() || 'Negotiable'}</span>
-                    </div>
-                  )}
-                  {job.experience && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Briefcase className="w-4 h-4" />
-                      <span>{job.experience}</span>
-                    </div>
-                  )}
-                </div>
-
-                {job.skills && job.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.slice(0, 3).map((skill, idx) => (
-                      <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                        {skill}
+            filteredJobs.map(job => {
+              const isApplied = appliedJobIds.includes(job._id);
+              return (
+                <div
+                  key={job._id}
+                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                >
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/jobs/${job._id}`)}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">{job.title}</h2>
+                        <p className="text-gray-600">{job.companyName || 'Company'}</p>
+                      </div>
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {job.jobType}
                       </span>
-                    ))}
-                    {job.skills.length > 3 && (
-                      <span className="text-gray-600 text-sm">+{job.skills.length - 3} more</span>
+                    </div>
+
+                    <p className="text-gray-600 mb-4 line-clamp-2">{job.description}</p>
+
+                    <div className="flex flex-wrap gap-6 mb-4">
+                      {job.location && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <MapPin className="w-4 h-4" />
+                          <span>{job.location}</span>
+                        </div>
+                      )}
+                      {job.salary?.min && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <DollarSign className="w-4 h-4" />
+                          <span>${job.salary.min.toLocaleString()} - ${job.salary.max?.toLocaleString() || 'Negotiable'}</span>
+                        </div>
+                      )}
+                      {job.experience && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Briefcase className="w-4 h-4" />
+                          <span>{job.experience}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {job.skills && job.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {job.skills.slice(0, 3).map((skill, idx) => (
+                          <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                            {skill}
+                          </span>
+                        ))}
+                        {job.skills.length > 3 && (
+                          <span className="text-gray-600 text-sm">+{job.skills.length - 3} more</span>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
-            ))
+
+                  {/* Applied Status Button */}
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    {isApplied ? (
+                      <button
+                        disabled
+                        className="w-full bg-green-100 text-green-700 px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
+                      >
+                        <CheckCircle className="w-5 h-5" />
+                        Applied
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => navigate(`/jobs/${job._id}`)}
+                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+                      >
+                        Apply Now
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Menu, X, LogOut } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -42,6 +43,12 @@ function Navbar() {
                     >
                       My Applications
                     </button>
+                    <button
+                      onClick={() => navigate('/resume-builder')}
+                      className="text-gray-600 hover:text-gray-900 font-medium"
+                    >
+                      Resume Builder
+                    </button>
                   </>
                 )}
 
@@ -61,6 +68,9 @@ function Navbar() {
                     </button>
                   </>
                 )}
+
+                {/* Notification Bell */}
+                <NotificationBell />
 
                 <div className="flex items-center space-x-4 border-l border-gray-200 pl-4">
                   <span className="text-gray-600">{user?.name}</span>
