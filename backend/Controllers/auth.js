@@ -11,9 +11,9 @@ function generateOTP() {
 
 export async function register(req, res) {
   try {
-    const { name, email, password, userType, companyName } = req.body;
+    const { name, email, password, userType, companyName, skills, idToken } = req.body;
 
-    console.log('📝 Registration attempt:', { name, email, userType, companyName: userType === 'employer' ? companyName : 'N/A' });
+    console.log('📝 Registration attempt:', { name, email, userType, companyName: userType === 'employer' ? companyName : 'N/A', isFirebaseAuth: !!idToken });
 
     // Validation
     if (!name || !email || !password || !userType) {
@@ -38,9 +38,16 @@ export async function register(req, res) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash password (or use Firebase token directly)
+    let hashedPassword;
+    if (idToken) {
+      // Firebase auth - store the token as password placeholder
+      hashedPassword = idToken;
+      console.log('🔐 Using Firebase authentication');
+    } else {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
 
     // Generate OTP
     const otp = generateOTP();
@@ -55,22 +62,50 @@ export async function register(req, res) {
       password: hashedPassword,
       userType,
       companyName: userType === 'employer' ? companyName : null,
+      skills: userType === 'job_seeker' ? (skills || []) : [],
       otp,
       otpExpiry,
+      isEmailVerified: idToken ? true : false, // Auto-verify Firebase users
+      isGoogleAuth: idToken ? true : false, // Mark as Google user
     });
 
     console.log('💾 Saving user to database...');
     await user.save();
 
-    // Send OTP email
-    console.log('📧 Sending OTP email to:', email);
-    await sendOTPEmail(email, otp);
+    // Send OTP email only if not Firebase auth (Firebase users are auto-verified)
+    if (!idToken) {
+      console.log('📧 Sending OTP email to:', email);
+      await sendOTPEmail(email, otp);
+    } else {
+      console.log('✅ Firebase user auto-verified, skipping OTP');
+    }
 
     console.log('✅ Registration successful:', email);
-    res.status(201).json({
-      message: 'User registered successfully. Please verify your email with the OTP sent to your email.',
+    
+    // For Firebase users, generate JWT token immediately (no OTP needed)
+    let responseData = {
+      message: idToken ? 'User registered successfully with Google!' : 'User registered successfully. Please verify your email with the OTP sent to your email.',
       email,
-    });
+      requiresOTP: !idToken,
+    };
+
+    if (idToken) {
+      const token = jwt.sign(
+        { userId: user._id, userType: user.userType },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+      responseData.token = token;
+      responseData.user = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType,
+        isEmailVerified: user.isEmailVerified,
+      };
+    }
+
+    res.status(201).json(responseData);
   } catch (error) {
     console.error('❌ Registration error:', error.message);
     console.error('   Stack:', error.stack);
@@ -185,7 +220,7 @@ export async function resendOTP(req, res) {
 
 export async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, isGoogleAuth } = req.body;
 
     // Validation
     if (!email || !password) {
@@ -207,10 +242,17 @@ export async function login(req, res) {
       });
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    // Handle Google Auth users
+    if (isGoogleAuth) {
+      // For Google users, just verify they exist and are verified
+      // Firebase has already authenticated them
+      console.log('🔐 Google auth login for:', email);
+    } else {
+      // For traditional users, verify password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
     }
 
     // Generate token
@@ -229,6 +271,7 @@ export async function login(req, res) {
         email: user.email,
         userType: user.userType,
         isEmailVerified: user.isEmailVerified,
+        isGoogleAuth: user.isGoogleAuth,
         ...(user.userType === 'employer' && { companyName: user.companyName }),
       },
     });

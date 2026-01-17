@@ -30,27 +30,33 @@ function Navbar() {
             {isAuthenticated ? (
               <>
                 {user?.userType === 'job_seeker' && (
-                  <>
-                    <button
-                      onClick={() => navigate('/jobs')}
-                      className="text-gray-600 hover:text-gray-900 font-medium"
-                    >
-                      Browse Jobs
-                    </button>
-                    <button
-                      onClick={() => navigate('/applications')}
-                      className="text-gray-600 hover:text-gray-900 font-medium"
-                    >
-                      My Applications
-                    </button>
-                    <button
-                      onClick={() => navigate('/resume-builder')}
-                      className="text-gray-600 hover:text-gray-900 font-medium"
-                    >
-                      Resume Builder
-                    </button>
-                  </>
-                )}
+                   <>
+                     <button
+                       onClick={() => navigate('/jobs')}
+                       className="text-gray-600 hover:text-gray-900 font-medium"
+                     >
+                       Browse Jobs
+                     </button>
+                     <button
+                       onClick={() => navigate('/saved-jobs')}
+                       className="text-gray-600 hover:text-gray-900 font-medium"
+                     >
+                       Saved Jobs
+                     </button>
+                     <button
+                       onClick={() => navigate('/applications')}
+                       className="text-gray-600 hover:text-gray-900 font-medium"
+                     >
+                       My Applications
+                     </button>
+                     <button
+                       onClick={() => navigate('/resume-builder')}
+                       className="text-gray-600 hover:text-gray-900 font-medium"
+                     >
+                       Resume Builder
+                     </button>
+                   </>
+                 )}
 
                 {user?.userType === 'employer' && (
                   <>
@@ -129,6 +135,15 @@ function Navbar() {
                       className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100"
                     >
                       Browse Jobs
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate('/saved-jobs');
+                        setMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100"
+                    >
+                      Saved Jobs
                     </button>
                     <button
                       onClick={() => {

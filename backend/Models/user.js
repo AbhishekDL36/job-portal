@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema({
     default: 0,
   },
 
+  // Google Auth Flag
+  isGoogleAuth: {
+    type: Boolean,
+    default: false,
+  },
+
   // Job Seeker specific fields
   resume: String,
   skills: [String],

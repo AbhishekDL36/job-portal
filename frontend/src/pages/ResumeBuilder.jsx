@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { resumeAPI } from '../api/auth';
+import { resumeAPI, authAPI } from '../api/auth';
 import { useNotification } from '../context/NotificationContext';
 import { Save, Plus, Trash2, AlertCircle, CheckCircle, Lightbulb, TrendingUp, Eye } from 'lucide-react';
 
@@ -32,18 +32,58 @@ function ResumeBuilder() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchResume();
+    fetchResumeAndUserData();
   }, []);
 
-  const fetchResume = async () => {
+  const fetchResumeAndUserData = async () => {
     try {
       setLoading(true);
-      const response = await resumeAPI.getResume();
-      setResume(response.data);
-      setAtsScore(response.data.atsScore || 0);
-      setSuggestions(response.data.suggestions || []);
-    } catch (err) {
-      console.log('No resume found yet - creating new');
+      
+      // First, fetch user profile to get name and skills
+      let userProfile = null;
+      try {
+        const userResponse = await authAPI.getProfile();
+        userProfile = userResponse.data;
+      } catch (err) {
+        console.log('Could not fetch user profile');
+      }
+
+      // Try to fetch existing resume
+      try {
+        const response = await resumeAPI.getResume();
+        setResume(response.data);
+        setAtsScore(response.data.atsScore || 0);
+        setSuggestions(response.data.suggestions || []);
+      } catch (err) {
+        // No resume found yet - create new with user data
+        console.log('No resume found yet - creating new with user data');
+        
+        if (userProfile) {
+          // Pre-fill with user data
+          const newResume = {
+            title: 'My Resume',
+            personalInfo: {
+              fullName: userProfile.name || '',
+              email: userProfile.email || '',
+              phone: userProfile.phone || '',
+              location: userProfile.location || '',
+              website: '',
+              linkedin: '',
+            },
+            summary: '',
+            experience: [],
+            education: [],
+            skills: userProfile.skills ? userProfile.skills.map(skill => ({
+              skill: skill,
+              proficiency: 'Intermediate'
+            })) : [],
+            certifications: [],
+            projects: [],
+            languages: [],
+          };
+          setResume(newResume);
+        }
+      }
     } finally {
       setLoading(false);
     }

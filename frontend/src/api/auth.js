@@ -35,3 +35,11 @@ export const resumeAPI = {
   getSuggestions: () => client.get('/resume/suggestions'),
   getJobMatch: (jobId) => client.get(`/resume/match/${jobId}`),
 };
+
+export const savedJobsAPI = {
+  getSavedJobs: () => client.get('/saved-jobs'),
+  saveJob: (jobId) => client.post(`/saved-jobs/${jobId}/save`),
+  unsaveJob: (jobId) => client.delete(`/saved-jobs/${jobId}`),
+  checkIfSaved: (jobId) => client.get(`/saved-jobs/${jobId}/check`),
+  getSavedJobsCount: () => client.get('/saved-jobs/count'),
+};

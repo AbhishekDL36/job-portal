@@ -14,6 +14,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import JobsList from './pages/JobsList';
 import JobDetail from './pages/JobDetail';
 import Applications from './pages/Applications';
+import SavedJobs from './pages/SavedJobs';
 import ResumeBuilder from './pages/ResumeBuilder';
 import ResumePreview from './pages/ResumePreview';
 import EmployerDashboard from './pages/EmployerDashboard';
@@ -56,6 +57,14 @@ function AppContent() {
           element={
             <PrivateRoute requiredRole="job_seeker">
               <Applications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/saved-jobs"
+          element={
+            <PrivateRoute requiredRole="job_seeker">
+              <SavedJobs />
             </PrivateRoute>
           }
         />

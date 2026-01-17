@@ -9,6 +9,7 @@ import authRouter from "./Routers/auth.js";
 import applicationRouter from "./Routers/application.js";
 import jobRouter from "./Routers/job.js";
 import resumeRouter from "./Routers/resume.js";
+import savedJobRouter from "./Routers/savedJob.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/applications', applicationRouter);
 app.use('/api/jobs', jobRouter);
 app.use('/api/resume', resumeRouter);
+app.use('/api/saved-jobs', savedJobRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
