@@ -163,11 +163,17 @@ export async function sendApplicationStatusUpdateEmail(email, jobTitle, status) 
 
 export async function testEmailConnection() {
   try {
-    await transporter.verify();
+    // Set a timeout for email verification to avoid blocking startup
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Email verification timeout')), 5000)
+    );
+    
+    await Promise.race([transporter.verify(), timeoutPromise]);
     console.log('✅ Email service is connected and ready');
     return true;
   } catch (error) {
-    console.error('❌ Email service connection failed:', error);
+    console.warn('⚠️  Email service not available (non-critical):', error.message);
+    console.warn('   The app will continue to run, but emails may not be sent.');
     return false;
   }
 }
