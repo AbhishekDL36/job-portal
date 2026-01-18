@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Briefcase, Users, Search, CheckCircle } from 'lucide-react';
@@ -7,12 +7,29 @@ function Home() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
-  if (isAuthenticated && user) {
-    if (user.userType === 'job_seeker') {
-      return navigate('/jobs');
-    } else {
-      return navigate('/employer/jobs');
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.userType === 'job_seeker') {
+        navigate('/jobs');
+      } else {
+        navigate('/employer/jobs');
+      }
     }
+  }, [isAuthenticated, user, navigate]);
+
+  // Show loading screen while redirecting
+  if (isAuthenticated && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="mb-4">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.name}!</h2>
+          <p className="text-gray-600">Redirecting you to dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
