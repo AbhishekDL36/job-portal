@@ -75,8 +75,8 @@ export async function checkApplications(req, res) {
 
     // Get all applications for these jobs
     const applications = await Application.find({ jobId: { $in: jobIds } })
-      .populate('userId', 'name email phone location skills experience')
-      .populate('jobId', 'title companyName')
+      .populate('userId', '_id name email phone location skills experience')
+      .populate('jobId', '_id title companyName postedBy')
       .sort({ appliedAt: -1 });
 
     res.json(applications);
@@ -86,13 +86,42 @@ export async function checkApplications(req, res) {
   }
 }
 
+// export async function getUserApplications(req, res) {
+//   try {
+//     const applications = await Application.find({ userId: req.userId })
+//       .populate('userId', '_id name email phone location skills experience')
+//       .populate({
+//         path: 'jobId',
+//         select: '_id title companyName postedBy',
+//         populate: {
+//           path: 'postedBy',
+//           model: 'User',
+//           select: '_id name companyName email',
+//         },
+//       })
+//       .sort({ appliedAt: -1 });
+
+//     res.json(applications);
+//   } catch (error) {
+//     console.error('Get user applications error:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
+
 export async function getUserApplications(req, res) {
   try {
     const applications = await Application.find({ userId: req.userId })
       .populate({
+        path: 'userId',
+        select: '_id name email phone'
+      })
+      .populate({
         path: 'jobId',
-        select: 'title description location salary jobType companyName postedBy',
-        populate: { path: 'postedBy', select: 'name companyName email' },
+        populate: {
+          path: 'postedBy',
+          select: '_id name companyName email'
+        }
       })
       .sort({ appliedAt: -1 });
 
@@ -102,6 +131,7 @@ export async function getUserApplications(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
 
 export async function updateApplicationStatus(req, res) {
   try {

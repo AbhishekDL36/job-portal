@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, MessageSquare } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 function Navbar() {
@@ -77,6 +77,15 @@ function Navbar() {
 
                 {/* Notification Bell */}
                 <NotificationBell />
+
+                {/* Chat Link */}
+                <button
+                  onClick={() => navigate('/chat')}
+                  className="text-gray-600 hover:text-gray-900 font-medium flex items-center gap-2"
+                >
+                  <MessageSquare size={20} />
+                  Messages
+                </button>
 
                 <div className="flex items-center space-x-4 border-l border-gray-200 pl-4">
                   <span className="text-gray-600">{user?.name}</span>
@@ -154,11 +163,23 @@ function Navbar() {
                     >
                       My Applications
                     </button>
-                  </>
-                )}
+                    </>
+                    )}
 
-                {user?.userType === 'employer' && (
-                  <>
+                    {/* Chat Link - Mobile */}
+                    <button
+                    onClick={() => {
+                    navigate('/chat');
+                    setMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                    <MessageSquare size={18} />
+                    Messages
+                    </button>
+
+                    {user?.userType === 'employer' && (
+                    <>
                     <button
                       onClick={() => {
                         navigate('/employer/jobs');
@@ -177,18 +198,18 @@ function Navbar() {
                     >
                       Post Job
                     </button>
-                  </>
-                )}
+                    </>
+                    )}
 
-                <button
-                  onClick={() => {
+                    <button
+                    onClick={() => {
                     handleLogout();
                     setMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 border-t border-gray-200 mt-2"
-                >
-                  Logout
-                </button>
+                    }}
+                    className="block w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 border-t border-gray-200 mt-2"
+                    >
+                    Logout
+                    </button>
               </>
             ) : (
               <>

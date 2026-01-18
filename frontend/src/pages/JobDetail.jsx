@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { MapPin, DollarSign, Briefcase, AlertCircle, CheckCircle } from 'lucide-react';
 import ShareButton from '../components/ShareButton';
 import SimilarJobs from '../components/SimilarJobs';
+import StartChatButton from '../components/Chat/StartChatButton';
 
 function JobDetail() {
   const { id } = useParams();
@@ -155,12 +156,21 @@ function JobDetail() {
           {isAuthenticated && user?.userType === 'job_seeker' && (
             <div className="mb-8">
               {!showApplyForm ? (
-                <button
-                  onClick={() => setShowApplyForm(true)}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold"
-                >
-                  Apply Now
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowApplyForm(true)}
+                    className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold"
+                  >
+                    Apply Now
+                  </button>
+                  <StartChatButton 
+                    employerId={job.postedBy?._id || job.postedBy}
+                    jobSeekerId={user?._id || user?.id}
+                    jobId={job._id}
+                    currentUserId={user?._id || user?.id}
+                    otherPersonName={job.postedBy?.companyName || job.postedBy?.name}
+                  />
+                </div>
               ) : (
                 <form onSubmit={handleApply} className="space-y-4 border-t pt-6">
                   <h3 className="text-lg font-bold">Application Form</h3>

@@ -10,6 +10,7 @@ import applicationRouter from "./Routers/application.js";
 import jobRouter from "./Routers/job.js";
 import resumeRouter from "./Routers/resume.js";
 import savedJobRouter from "./Routers/savedJob.js";
+import messageRouter from "./Routers/message.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/applications', applicationRouter);
 app.use('/api/jobs', jobRouter);
 app.use('/api/resume', resumeRouter);
 app.use('/api/saved-jobs', savedJobRouter);
+app.use('/api/messages', messageRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -49,7 +51,7 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);

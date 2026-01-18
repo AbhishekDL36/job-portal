@@ -4,30 +4,38 @@ import { jobsAPI, applicationsAPI } from '../api/auth';
 import { Briefcase, Plus, Users, AlertCircle } from 'lucide-react';
 
 function EmployerDashboard() {
-  const navigate = useNavigate();
-  const [jobs, setJobs] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+   const navigate = useNavigate();
+   const [jobs, setJobs] = useState([]);
+   const [stats, setStats] = useState(null);
+   const [applications, setApplications] = useState([]);
+   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+   useEffect(() => {
+     fetchData();
+   }, []);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [jobsRes, statsRes] = await Promise.all([
-        jobsAPI.getMyJobs(),
-        applicationsAPI.getApplicationStats(),
-      ]);
-      setJobs(jobsRes.data);
-      setStats(statsRes.data);
-    } catch (err) {
-      console.error('Failed to fetch data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+   const fetchData = async () => {
+     try {
+       setLoading(true);
+       const [jobsRes, statsRes, appsRes] = await Promise.all([
+         jobsAPI.getMyJobs(),
+         applicationsAPI.getApplicationStats(),
+         applicationsAPI.getCheckApplications(),
+       ]);
+       setJobs(jobsRes.data);
+       setStats(statsRes.data);
+       setApplications(appsRes.data || []);
+     } catch (err) {
+       console.error('Failed to fetch data:', err);
+     } finally {
+       setLoading(false);
+     }
+   };
+
+   // Get applicants count for a job from applications
+   const getApplicantsForJob = (jobId) => {
+     return applications.filter(app => app.jobId?._id === jobId).length;
+   };
 
   const handleDeleteJob = async (jobId) => {
     if (window.confirm('Are you sure you want to delete this job?')) {
@@ -125,15 +133,15 @@ function EmployerDashboard() {
                   <p className="text-gray-600 mb-4 line-clamp-2">{job.description}</p>
 
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-6 text-gray-600">
-                      {job.salary?.min && (
-                        <span>${job.salary.min.toLocaleString()}</span>
-                      )}
-                      <span className="flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        {job.applicants?.length || 0} applicants
-                      </span>
-                    </div>
+                     <div className="flex items-center gap-6 text-gray-600">
+                       {job.salary?.min && (
+                         <span>${job.salary.min.toLocaleString()}</span>
+                       )}
+                       <span className="flex items-center gap-2">
+                         <Users className="w-4 h-4" />
+                         {getApplicantsForJob(job._id)} applicants
+                       </span>
+                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => navigate(`/employer/applications/${job._id}`)}

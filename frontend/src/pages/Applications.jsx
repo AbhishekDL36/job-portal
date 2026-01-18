@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { applicationsAPI } from '../api/auth';
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useApplicationMonitor } from '../hooks/useApplicationMonitor';
+import { useAuth } from '../context/AuthContext';
+import StartChatButton from '../components/Chat/StartChatButton';
 
 function Applications() {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
+   const [applications, setApplications] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [filter, setFilter] = useState('all');
+   const { user } = useAuth();
 
-  // Monitor for application status changes
-  useApplicationMonitor();
+   // Monitor for application status changes
+   useApplicationMonitor();
 
   useEffect(() => {
     fetchApplications();
@@ -19,9 +22,17 @@ function Applications() {
     try {
       setLoading(true);
       const response = await applicationsAPI.getUserApplications();
+      console.log('✅ Applications Response:', response.data);
+      if (response.data.length > 0) {
+        console.log('🔍 First App Structure:', {
+          jobId: response.data[0]?.jobId,
+          postedBy: response.data[0]?.jobId?.postedBy,
+          employerId: response.data[0]?.jobId?.postedBy?._id,
+        });
+      }
       setApplications(response.data);
     } catch (err) {
-      console.error('Failed to fetch applications:', err);
+      console.error('❌ Failed to fetch applications:', err);
     } finally {
       setLoading(false);
     }
@@ -122,8 +133,40 @@ function Applications() {
                   </div>
                 )}
 
-                <div className="text-sm text-gray-500">
-                  Applied on {new Date(app.appliedAt).toLocaleDateString()}
+                <div className="flex justify-between items-center mt-4">
+                   <div className="text-sm text-gray-500">
+                     Applied on {new Date(app.appliedAt).toLocaleDateString()}
+                   </div>
+                   {(() => {
+                      const employerId =
+                        typeof app.jobId?.postedBy === 'string'
+                          ? app.jobId.postedBy
+                          : app.jobId?.postedBy?._id;
+
+                      console.log("DEBUG EMPLOYMENT ID:", {
+                        postedBy: app.jobId?.postedBy,
+                        employerId,
+                        jobId: app.jobId?._id,
+                        userId: user?._id,
+                      });
+
+                      return employerId ? (
+                       <StartChatButton 
+                         employerId={employerId}
+                         jobSeekerId={user?._id || user?.id}
+                         jobId={app.jobId._id}
+                         applicationId={app._id}
+                         currentUserId={user?._id || user?.id}
+                         otherPersonName={
+                           app.jobId.postedBy?.companyName || app.jobId.postedBy?.name
+                         }
+                       />
+                     ) : (
+                       <button disabled className="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg text-sm cursor-not-allowed">
+                         Chat unavailable
+                       </button>
+                     );
+                   })()}
                 </div>
 
                 {app.status === 'accepted' && (

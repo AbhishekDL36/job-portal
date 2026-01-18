@@ -20,6 +20,7 @@ import ResumePreview from './pages/ResumePreview';
 import EmployerDashboard from './pages/EmployerDashboard';
 import PostJob from './pages/PostJob';
 import EmployerApplications from './pages/EmployerApplications';
+import Chat from './pages/Chat';
 
 function AppContent() {
   const { isAuthenticated, user } = useAuth();
@@ -107,6 +108,24 @@ function AppContent() {
           element={
             <PrivateRoute requiredRole="employer">
               <EmployerApplications />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Chat Routes - Both job seekers and employers */}
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute>
+              <Chat />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat/:conversationId"
+          element={
+            <PrivateRoute>
+              <Chat />
             </PrivateRoute>
           }
         />

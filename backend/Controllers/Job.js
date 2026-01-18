@@ -14,8 +14,8 @@ export async function getMyJobs(req, res) {
     }
 
     const jobs = await Job.find({ postedBy: req.userId })
-      .populate('postedBy', 'name companyName email')
-      .populate('applicants', 'name email')
+      .populate('postedBy', '_id name companyName email')
+      .populate('applicants', '_id name email')
       .sort({ createdAt: -1 });
 
     res.json(jobs);
@@ -55,7 +55,7 @@ export async function getAllJobs(req, res) {
     }
 
     const jobs = await Job.find(query)
-      .populate('postedBy', 'name companyName email industry')
+      .populate('postedBy', '_id name companyName email industry')
       .sort({ createdAt: -1 })
       .limit(50);
 
@@ -69,7 +69,7 @@ export async function getAllJobs(req, res) {
 export async function getJobById(req, res) {
   try {
     const job = await Job.findById(req.params.id)
-      .populate('postedBy', 'name companyName email industry companyDescription')
+      .populate('postedBy', '_id name companyName email industry companyDescription')
       .populate('applicants', 'name email');
 
     if (!job) {
@@ -221,7 +221,7 @@ export async function searchJobs(req, res) {
         { skills: { $in: [new RegExp(q, 'i')] } },
       ],
     })
-      .populate('postedBy', 'name companyName email')
+      .populate('postedBy', '_id name companyName email')
       .sort({ createdAt: -1 })
       .limit(20);
 

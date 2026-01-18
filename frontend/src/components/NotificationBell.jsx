@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import { applicationsAPI } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 function NotificationBell() {
-  const [notifications, setNotifications] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [readNotifications, setReadNotifications] = useState(new Set());
+   const { user } = useAuth();
+   const [notifications, setNotifications] = useState([]);
+   const [showDropdown, setShowDropdown] = useState(false);
+   const [unreadCount, setUnreadCount] = useState(0);
+   const [readNotifications, setReadNotifications] = useState(new Set());
 
   // Load read notifications from localStorage on mount
   useEffect(() => {
@@ -31,6 +33,14 @@ function NotificationBell() {
   // Note: This function will be called with updated readNotifications via useEffect dependency
   const fetchNotifications = async (readSet = readNotifications) => {
     try {
+      // Only fetch notifications for job seekers
+      // Employers don't have notifications for applications
+      if (user?.userType !== 'job_seeker') {
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
+
       const response = await applicationsAPI.getUserApplications();
       const apps = response.data;
       
@@ -52,6 +62,9 @@ function NotificationBell() {
       setUnreadCount(unreadCount);
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
+      // Silently fail for employers
+      setNotifications([]);
+      setUnreadCount(0);
     }
   };
 
