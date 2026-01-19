@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || "https://job-backend-owxg.onrender.com/api"
+const API_URL =  "https://job-backend-owxg.onrender.com/api"
 
 console.log('🌐 API URL configured:', API_URL);
 
